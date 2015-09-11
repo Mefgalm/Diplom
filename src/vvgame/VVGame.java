@@ -16,6 +16,8 @@ public class VVGame {
      */
     public static void main(String[] args) {
         System.out.println("Hello git");
+        if (4 == 4) {
+            System.out.println("adsasd");
+        }
     }
-    
 }
