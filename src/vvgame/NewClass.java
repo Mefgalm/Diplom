@@ -10,5 +10,7 @@ package vvgame;
  * @author Mef
  */
 public class NewClass {
-    public void mfain() {}
+    public void mfain() {//fdsfsdfsdfsfdsf
+        
+    }
 }
