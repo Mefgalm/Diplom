@@ -19,11 +19,13 @@ public class Client {
 
     private InputStream inputStream;
     private OutputStream outputStream;
+    private Socket socket;
     private String nickname;
 
     public Client(Socket socket) throws IOException {
         this.inputStream = socket.getInputStream();
         this.outputStream = socket.getOutputStream();
+        this.socket = socket;
     }
 
     public InputStream getInputStream() {
@@ -38,6 +40,14 @@ public class Client {
         return outputStream;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
     public void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
     }
@@ -48,15 +58,6 @@ public class Client {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.inputStream);
-        hash = 67 * hash + Objects.hashCode(this.outputStream);
-        hash = 67 * hash + Objects.hashCode(this.nickname);
-        return hash;
     }
 
     public void sendData(byte[] data) throws IOException {
@@ -82,6 +83,16 @@ public class Client {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.inputStream);
+        hash = 41 * hash + Objects.hashCode(this.outputStream);
+        hash = 41 * hash + Objects.hashCode(this.socket);
+        hash = 41 * hash + Objects.hashCode(this.nickname);
+        return hash;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -96,9 +107,17 @@ public class Client {
         if (!Objects.equals(this.outputStream, other.outputStream)) {
             return false;
         }
+        if (!Objects.equals(this.socket, other.socket)) {
+            return false;
+        }
         if (!Objects.equals(this.nickname, other.nickname)) {
             return false;
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Client{" + "inputStream=" + inputStream + ", outputStream=" + outputStream + ", socket=" + socket + ", nickname=" + nickname + '}';
+    }            
 }

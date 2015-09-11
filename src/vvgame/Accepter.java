@@ -6,6 +6,7 @@
 package vvgame;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,8 +43,9 @@ public class Accepter {
         public void run() {
             while (isActive) {
                 try {
-                    Client client = new Client(serverSocket.getServerSocket().accept());
-                    controller.addClient(client);
+                    Socket socket = serverSocket.getServerSocket().accept();
+                    controller.addClient(new Client(socket));
+                    System.out.println("New connection " + socket);
                 } catch (IOException ex) {
                     Logger.getLogger(Accepter.class.getName()).log(Level.SEVERE, null, ex);
                 }

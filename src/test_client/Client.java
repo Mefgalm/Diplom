@@ -17,9 +17,27 @@ import vvgame.CONSTANS;
  */
 public class Client {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Socket socket = new Socket("127.0.0.1", CONSTANS.PORT);
-        DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-        dataOutputStream.write("Vlad".getBytes());
+        BufferedOutputStream dataOutputStream = new BufferedOutputStream(socket.getOutputStream());
+        Thread.sleep(5000);
+        try {
+            dataOutputStream.write("Vlad".getBytes());
+            dataOutputStream.flush();
+            
+            Thread.sleep(1000);
+            
+            dataOutputStream.write("Game".getBytes());
+            dataOutputStream.flush();
+            
+            Thread.sleep(1000);
+            
+            dataOutputStream.write("TTT".getBytes());
+            dataOutputStream.flush();
+        } finally {            
+            dataOutputStream.close();
+            socket.close();
+        }
+        
     }
 }
