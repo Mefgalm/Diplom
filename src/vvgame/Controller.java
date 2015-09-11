@@ -5,6 +5,7 @@
  */
 package vvgame;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,9 +13,21 @@ import java.util.List;
  * @author Mef
  */
 public class Controller {
-    private List<Client> clientList;
+    private final List<Client> clientList;
+    
+    public Controller() {
+        clientList = new LinkedList<>();
+    }
+    
+    public void daMany() {
+        
+    }
 
     public List<Client> getClientList() {
         return clientList;
     }    
+    
+    public void addClient(Client client) {
+        clientList.add(client);
+    }
 }

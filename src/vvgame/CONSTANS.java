@@ -9,8 +9,6 @@ package vvgame;
  *
  * @author Mef
  */
-public class NewClass {
-    public void mfain() {//fdsfsdfsdfsfdsf
-        
-    }
+public final class CONSTANS {
+    public static final int PORT = 500;
 }

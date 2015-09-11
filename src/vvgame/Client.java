@@ -5,8 +5,10 @@
  */
 package vvgame;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.Objects;
 
 /**
@@ -14,14 +16,14 @@ import java.util.Objects;
  * @author Mef
  */
 public class Client {
+
     private InputStream inputStream;
     private OutputStream outputStream;
     private String nickname;
 
-    public Client(InputStream inputStream, OutputStream outputStream, String nickname) {
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
-        this.nickname = nickname;
+    public Client(Socket socket) throws IOException {
+        this.inputStream = socket.getInputStream();
+        this.outputStream = socket.getOutputStream();
     }
 
     public InputStream getInputStream() {
@@ -57,6 +59,28 @@ public class Client {
         return hash;
     }
 
+    public void sendData(byte[] data) throws IOException {
+        outputStream.write(data);
+    }
+
+    public byte[] receiveData() {
+        byte[] b = new byte[1000];
+        new Thread(() -> {
+            boolean isAlive = true;
+            while (isAlive) {
+                try {
+                    inputStream.read(b);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    isAlive = false;
+                } finally {
+                    isAlive = false;
+                }
+            }
+        }).start();
+        return b;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -76,6 +100,5 @@ public class Client {
             return false;
         }
         return true;
-    }        
+    }
 }
-
