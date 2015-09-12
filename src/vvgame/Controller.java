@@ -6,6 +6,7 @@
 package vvgame;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -53,6 +54,20 @@ public class Controller {
             }
         });
         thread.start();
+        
+        BufferedOutputStream dataOutputStream = new BufferedOutputStream(client.getOutputStream());
+        try {
+            dataOutputStream.write("500".getBytes());
+            dataOutputStream.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            /*try {
+                dataOutputStream.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            }*/
+        }
 
     }
 }
