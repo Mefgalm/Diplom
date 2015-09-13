@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package test_client;
+package LinkObjects;
 
 import java.io.Serializable;
 
@@ -11,8 +11,6 @@ import java.io.Serializable;
  *
  * @author Mef
  */
-public class ClientData implements Serializable {
-    private int apm;
-    private String name;
-    private float KDA;
+public class MatchData implements Serializable {
+    
 }

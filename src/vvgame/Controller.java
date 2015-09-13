@@ -5,26 +5,22 @@
  */
 package vvgame;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import LinkObjects.UserData;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Mef
  */
-public class Controller {
+public class Controller implements Reciever {    
 
     private final List<Client> clientList;
+    private MatchMaker matchMaker;    
 
     public Controller() {
         clientList = new LinkedList<>();
+        matchMaker = new MatchMaker();
     }
 
     public List<Client> getClientList() {
@@ -33,41 +29,22 @@ public class Controller {
 
     public void addClient(Client client) {
         clientList.add(client);
-        byte[] b = new byte[100];
-        BufferedInputStream dataInputStream = new BufferedInputStream(client.getInputStream());
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean isAlive = true;
-                int byteCount = 0;
-                while (isAlive) {
-                    try {  
-                        byteCount = dataInputStream.read(b);
-                        if( byteCount == -1 ) {
-                            break;
-                        }
-                        System.out.println(new String(b));
-                    } catch (IOException ex) {
-                        Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        });
-        thread.start();
-        
-        BufferedOutputStream dataOutputStream = new BufferedOutputStream(client.getOutputStream());
-        try {
-            dataOutputStream.write("500".getBytes());
-            dataOutputStream.flush();
-        } catch (IOException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            /*try {
-                dataOutputStream.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
-        }
+        client.registerNewReciever(this);
+        client.startThread();        
+    }
 
+    @Override
+    public void recieveData(int code, Object data, Client client) {
+        switch(code) {
+            case CONSTANS.CONTROLLER_REQUEST_USER_DATA:
+                client.setUserData((UserData) data);
+                System.out.println("Client = " + client + " set data = " + data);
+                break;
+            case CONSTANS.CONTROLLER_REQUEST_FIND_MATCH:
+                matchMaker.addClient(client);
+                clientList.remove(client);    
+                System.out.println("Client = " + client + " used match maker");
+                break;
+        }
     }
 }

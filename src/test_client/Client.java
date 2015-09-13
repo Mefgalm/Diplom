@@ -5,6 +5,9 @@
  */
 package test_client;
 
+import LinkObjects.MatchData;
+import LinkObjects.UserData;
+import Tools.SerialazibleTools;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -25,43 +28,41 @@ public class Client {
         Socket socket = new Socket("127.0.0.1", CONSTANS.PORT);
         BufferedOutputStream dataOutputStream = new BufferedOutputStream(socket.getOutputStream());
         BufferedInputStream dataInputStream = new BufferedInputStream(socket.getInputStream());
-        Thread.sleep(5000);
-        try {
-            dataOutputStream.write("Vlad".getBytes());
-            dataOutputStream.flush();
-            
-            Thread.sleep(1000);
-            
-            dataOutputStream.write("Game".getBytes());
-            dataOutputStream.flush();
-            
-            Thread.sleep(1000);
-            
-            dataOutputStream.write("TTT".getBytes());
-            dataOutputStream.flush();
-        } finally {            
-                     
-        }
-         Thread thread = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 boolean isAlive = true;
                 int byteCount = 0;
                 byte[] b = new byte[100];
                 while (isAlive) {
-                    try {  
+                    try {
                         byteCount = dataInputStream.read(b);
-                        if( byteCount == -1 ) {
+                        if (byteCount == -1) {
                             break;
                         }
                         System.out.println(new String(b));
                     } catch (IOException ex) {
                         Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                        isAlive = false;
                     }
                 }
             }
         });
         thread.start();
+
+        dataOutputStream.write(SerialazibleTools.createByteArray(CONSTANS.CONTROLLER_REQUEST_USER_DATA,
+                new UserData("Mefgalm", 1666, 5.3f)));
+        dataOutputStream.flush();
+        
+        Thread.sleep(600);
+        
+        dataOutputStream.write(SerialazibleTools.createByteArray(CONSTANS.CONTROLLER_REQUEST_USER_DATA,
+                new UserData("Mefgalm", 1666, 5.3f)));
+        dataOutputStream.flush();
+        
+        dataOutputStream.write(SerialazibleTools.createByteArray(CONSTANS.CONTROLLER_REQUEST_FIND_MATCH,
+                null));
+        dataOutputStream.flush();
         
     }
 }

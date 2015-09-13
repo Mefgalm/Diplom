@@ -5,11 +5,22 @@
  */
 package vvgame;
 
+import LinkObjects.UserData;
+import Tools.SerialazibleMessage;
+import Tools.SerialazibleTools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,12 +31,25 @@ public class Client {
     private InputStream inputStream;
     private OutputStream outputStream;
     private Socket socket;
-    private String nickname;
+
+    private final InetAddress address;
+    private final int port;
+    private final int localport;
+
+    private UserData userData;
+
+    private final List<Reciever> recieverCoreList;
 
     public Client(Socket socket) throws IOException {
         this.inputStream = socket.getInputStream();
         this.outputStream = socket.getOutputStream();
         this.socket = socket;
+
+        address = socket.getInetAddress();
+        port = socket.getPort();
+        localport = socket.getLocalPort();
+
+        recieverCoreList = new LinkedList<>();
     }
 
     public InputStream getInputStream() {
@@ -52,43 +76,90 @@ public class Client {
         this.outputStream = outputStream;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     public void sendData(byte[] data) throws IOException {
         outputStream.write(data);
     }
 
-    public byte[] receiveData() {
-        byte[] b = new byte[1000];
-        new Thread(() -> {
-            boolean isAlive = true;
-            while (isAlive) {
+    class ClientThread implements Runnable {
+
+        private boolean isActive;
+        private byte[] data;
+        private int byteCountReceived;
+
+        public ClientThread() {
+            this.isActive = true;
+            data = new byte[CONSTANS.BYTE_BUFFER_SIZE];
+        }
+
+        public void closeStreams() {
+            try {
+                inputStream.close();
+                outputStream.close();
+                socket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+        @Override
+        public void run() {
+            while (isActive) {
                 try {
-                    inputStream.read(b);
+                    inputStream.read(data);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
-                    isAlive = false;
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    isActive = false;
+                    closeStreams();
                 } finally {
-                    isAlive = false;
+                    try {
+                        SerialazibleMessage sm = SerialazibleTools.getSerialazibleMessage(data);
+                        for (Reciever rc : recieverCoreList) {
+                            rc.recieveData(sm.getCode(), sm.getObject(), Client.this);
+                        }
+                    } catch (IOException | ClassNotFoundException ex) {
+                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    Arrays.fill(data, (byte) 0);
                 }
             }
-        }).start();
-        return b;
+        }
+    }
+
+    public UserData getUserData() {
+        return userData;
+    }
+
+    public void setUserData(UserData userData) {
+        this.userData = userData;
+    }
+
+    public void registerNewReciever(Reciever reciever) {
+        recieverCoreList.add(reciever);
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" + ", address=" + address + ", port=" + port + ", localport=" + localport + '}';
+    }
+
+    public void startThread() {
+        ClientThread clientThread = new ClientThread();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(clientThread);
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 41 * hash + Objects.hashCode(this.inputStream);
-        hash = 41 * hash + Objects.hashCode(this.outputStream);
-        hash = 41 * hash + Objects.hashCode(this.socket);
-        hash = 41 * hash + Objects.hashCode(this.nickname);
+        hash = 61 * hash + Objects.hashCode(this.inputStream);
+        hash = 61 * hash + Objects.hashCode(this.outputStream);
+        hash = 61 * hash + Objects.hashCode(this.socket);
+        hash = 61 * hash + Objects.hashCode(this.address);
+        hash = 61 * hash + this.port;
+        hash = 61 * hash + this.localport;
+        hash = 61 * hash + Objects.hashCode(this.userData);
+        hash = 61 * hash + Objects.hashCode(this.recieverCoreList);
         return hash;
     }
 
@@ -110,14 +181,21 @@ public class Client {
         if (!Objects.equals(this.socket, other.socket)) {
             return false;
         }
-        if (!Objects.equals(this.nickname, other.nickname)) {
+        if (!Objects.equals(this.address, other.address)) {
+            return false;
+        }
+        if (this.port != other.port) {
+            return false;
+        }
+        if (this.localport != other.localport) {
+            return false;
+        }
+        if (!Objects.equals(this.userData, other.userData)) {
+            return false;
+        }
+        if (!Objects.equals(this.recieverCoreList, other.recieverCoreList)) {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "Client{" + "inputStream=" + inputStream + ", outputStream=" + outputStream + ", socket=" + socket + ", nickname=" + nickname + '}';
-    }            
+    }        
 }

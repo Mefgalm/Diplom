@@ -27,25 +27,26 @@ public class Accepter {
 
         isActive = true;
     }
-    
 
     public void execute() {
+        System.out.println("Server is running on port: " + CONSTANS.PORT);
         Thread thread = new Thread(new ClientListener());
         thread.start();
     }
-    
+
     public void stop() {
         isActive = false;
     }
 
     class ClientListener implements Runnable {
+
         @Override
         public void run() {
             while (isActive) {
                 try {
                     Socket socket = serverSocket.getServerSocket().accept();
-                    controller.addClient(new Client(socket));
                     System.out.println("New connection " + socket);
+                    controller.addClient(new Client(socket));
                 } catch (IOException ex) {
                     Logger.getLogger(Accepter.class.getName()).log(Level.SEVERE, null, ex);
                 }

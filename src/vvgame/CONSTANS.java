@@ -11,4 +11,9 @@ package vvgame;
  */
 public final class CONSTANS {
     public static final int PORT = 500;
+    
+    public static final int BYTE_BUFFER_SIZE = 150;
+    
+    public static final int CONTROLLER_REQUEST_USER_DATA = 4;
+    public static final int CONTROLLER_REQUEST_FIND_MATCH = 5;
 }
