@@ -5,12 +5,10 @@
  */
 package test_client;
 
-import LinkObjects.MatchData;
 import LinkObjects.UserData;
 import Tools.SerialazibleTools;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -57,7 +55,7 @@ public class Client {
         Thread.sleep(600);
         
         dataOutputStream.write(SerialazibleTools.createByteArray(CONSTANS.CONTROLLER_REQUEST_USER_DATA,
-                new UserData("Mefgalm", 1666, 5.3f)));
+                new UserData("ывафыавфы", 1666, 5.3f)));
         dataOutputStream.flush();
         
         dataOutputStream.write(SerialazibleTools.createByteArray(CONSTANS.CONTROLLER_REQUEST_FIND_MATCH,

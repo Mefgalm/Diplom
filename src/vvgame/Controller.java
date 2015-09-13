@@ -41,8 +41,8 @@ public class Controller implements Reciever {
                 System.out.println("Client = " + client + " set data = " + data);
                 break;
             case CONSTANS.CONTROLLER_REQUEST_FIND_MATCH:
-                matchMaker.addClient(client);
-                clientList.remove(client);    
+                /*matchMaker.addClient(client);
+                clientList.remove(client);    */
                 System.out.println("Client = " + client + " used match maker");
                 break;
         }
