@@ -60,6 +60,18 @@ public class Client {
         
         dataOutputStream.write(SerialazibleTools.createByteArray(CONSTANS.CONTROLLER_REQUEST_FIND_MATCH,
                 null));
+        dataOutputStream.flush();    
+        
+        Thread.sleep(600);
+        
+        dataOutputStream.write(SerialazibleTools.createByteArray(99,
+                null));
+        dataOutputStream.flush();
+        
+        Thread.sleep(600);
+        
+        dataOutputStream.write(SerialazibleTools.createByteArray(99,
+                null));
         dataOutputStream.flush();
         
     }

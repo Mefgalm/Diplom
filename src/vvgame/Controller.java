@@ -13,10 +13,10 @@ import java.util.List;
  *
  * @author Mef
  */
-public class Controller implements Reciever {    
+public class Controller implements Reciever {
 
     private final List<Client> clientList;
-    private MatchMaker matchMaker;    
+    private MatchMaker matchMaker;
 
     public Controller() {
         clientList = new LinkedList<>();
@@ -29,22 +29,23 @@ public class Controller implements Reciever {
 
     public void addClient(Client client) {
         clientList.add(client);
-        client.registerNewReciever(this);
-        client.startThread();        
+        client.setExecutor(Executor.newInstance().add(this));
+        client.startThread();
     }
 
     @Override
-    public void recieveData(int code, Object data, Client client) {
-        switch(code) {
+    public boolean recieveData(int code, Object data, Client client) {
+        switch (code) {
             case CONSTANS.CONTROLLER_REQUEST_USER_DATA:
                 client.setUserData((UserData) data);
                 System.out.println("Client = " + client + " set data = " + data);
-                break;
+                return true;
             case CONSTANS.CONTROLLER_REQUEST_FIND_MATCH:
-                /*matchMaker.addClient(client);
-                clientList.remove(client);    */
+                matchMaker.addClient(client);
+                clientList.remove(client);   
                 System.out.println("Client = " + client + " used match maker");
-                break;
+                return true;
         }
+        return false;
     }
 }

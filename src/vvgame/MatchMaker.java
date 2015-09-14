@@ -21,12 +21,19 @@ public class MatchMaker implements Reciever {
     }
     
     public void addClient(Client client) {
-        clientList.add(client);
+        client.getExecutor().add(this);
+        clientList.add(client);        
     }
 
     @Override
-    public void recieveData(int code, Object object, Client client) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean recieveData(int code, Object object, Client client) {
+        switch(code) {
+            case 99:
+                System.out.println("Match Maker");
+                //client.getExecutor().remove(this);
+                return true;
+        }
+        return false;
     }
 
 }

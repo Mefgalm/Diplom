@@ -10,5 +10,5 @@ package vvgame;
  * @author Mef
  */
 public interface Reciever {
-    void recieveData(int code, Object object, Client client);
+    boolean recieveData(int code, Object object, Client client);
 }

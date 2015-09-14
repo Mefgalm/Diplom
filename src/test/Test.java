@@ -7,44 +7,81 @@ package test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Mef
  */
-public class Test {
+class Executore {
+    List<A> aList;
+    
+    public Executore() {
+        aList = new LinkedList<>();
+    }
+    
+    public void add(A a) {
+        aList.add(a);
+    }
+    
+    @SuppressWarnings("empty-statement")
+    public void execute(int code) {
+        for( int i = 0; i < aList.size() && !aList.get(i).recieve(code); i++);
+    }
+}
 
-    static ConcurrentLinkedQueue<Integer> clq = new ConcurrentLinkedQueue<>();
-    static LinkedBlockingQueue<Integer> lbq = new LinkedBlockingQueue<>();
-    static List<Integer> intList = new LinkedList<>();
+abstract class A {
+    protected String name;
+    
+    public A(String name) {
+        this.name = name;
+    }   
+    
+    abstract boolean recieve(int code);
+}
 
-    static class Runn implements Runnable {
+class A1 extends A {
 
-        @Override
-        public void run() {
-            while (true) {
-                Integer head = lbq.poll();
-                System.out.println(head);
-                head++;
-                try {
-                    lbq.put(head);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
+    public A1(String name) {
+        super(name);
     }
 
+    @Override
+    boolean recieve(int code) {
+        switch(code) {
+            case 0:
+            case 1:
+                System.out.println(name);
+                return true;
+        }
+        return false;
+    }    
+}
+
+
+class A2 extends A {
+
+    public A2(String name) {
+        super(name);
+    }
+
+    @Override
+    boolean recieve(int code) {
+        switch(code) {
+            case 2:
+            case 3:
+                System.out.println(name);
+                return true;
+        }
+        return false;
+    }    
+}
+
+public class Test {   
     public static void main(String[] args) {
-        Executor executor = Executors.newCachedThreadPool();
-        intList.add(0);
-        clq.add(0);
-        lbq.add(0);
+        Executore executore = new Executore();
+        executore.add(new A1("v"));
+        executore.add(new A2("l"));
+        executore.execute(2);
+        
     }
 }

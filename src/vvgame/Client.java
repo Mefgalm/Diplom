@@ -39,6 +39,8 @@ public class Client {
     private UserData userData;
 
     private final List<Reciever> recieverCoreList;
+    
+    private Executor executor;
 
     public Client(Socket socket) throws IOException {
         this.inputStream = socket.getInputStream();
@@ -79,6 +81,10 @@ public class Client {
     public void sendData(byte[] data) throws IOException {
         outputStream.write(data);
     }
+    
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
 
     class ClientThread implements Runnable {
 
@@ -114,9 +120,7 @@ public class Client {
                 } finally {
                     try {
                         SerialazibleMessage sm = SerialazibleTools.getSerialazibleMessage(data);
-                        for (Reciever rc : recieverCoreList) {
-                            rc.recieveData(sm.getCode(), sm.getObject(), Client.this);
-                        }
+                        executor.execute(sm.getCode(), sm.getObject(), Client.this);
                     } catch (IOException | ClassNotFoundException ex) {
                         Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -126,6 +130,10 @@ public class Client {
         }
     }
 
+    public Executor getExecutor() {
+        return executor;
+    }
+        
     public UserData getUserData() {
         return userData;
     }
